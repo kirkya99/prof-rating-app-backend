@@ -62,7 +62,7 @@ app.put("/profs/:id", async function (req, res) {
         name: req.body.name,
         rating: req.body.rating
     }
-    await collection.updateOne({ id: toBeUpdated.id }, { $set: { rating: req.body.} })
+    await collection.updateOne({ id: toBeUpdated.id }, { $set: { rating: req.body.rating} })
     queryResult = await collection.find(query).toArray();
     res.status(200).send(queryResult);
 });
