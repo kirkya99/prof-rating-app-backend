@@ -28,36 +28,70 @@ connectToDatabase();
 
 async function connectToDatabase() {
     await client.connect();
-    console.log(`New database:\t${db.databaseName}\n`);
+    console.log(`Connecting to database:\t${db.databaseName}\n`);
     const indexResult = await collection.createIndex({ name: 1 });
-
-    console.log(`indexResult: ${JSON.stringify(indexResult)}\n`);
 }
 
-async function retrieveEntries()
-{
+async function retrieveEntries() {
+    console.log('Retrieve entries');
 
+    // TODO: return all entries
+    const allProfsQuery = {
+        category: "profs"
+    }
+
+    const profs = await collection.find(allProfsQuery).toArray();
+    profs.map((prof, i) => console.log(`${++i} ${JSON.stringify(prof)}`));
+    return profs;
 }
 
-async function retrieveEntry()
-{
-
+async function retrieveEntry(input) {
+    console.log('Retrieve entry');
+    // TODO: return entry
 }
 
-async function modifyEntry()
-{
+async function modifyEntry(input) {
+    console.log('Modify entry');
 
+    // TODO: modify entry
+    const entry = {
+        category: "profs",
+        name: input.name,
+        rating: input.rating
+    }
+
+    const query = { name: entry.name };
+    const update = { $set: entry };
+    const options = { upsert: true, new: true };
+
+    const result = await collection.updateOne(query, update, options);
+
+    console.log(`Modfication result: ${JSON.stringify(result)}\n`)
 }
 
-async function deleteEntry()
-{
-
-
+async function deleteEntry(input) {
+    console.log('Delete entry');
+    // TODO: delete entry
 }
 
-async function createEntry()
-{
+async function createEntry(input) {
+    console.log('Create entry');
 
+    // TODO: create entry
+
+    const entry = {
+        category: "profs",
+        name: input.name,
+        rating: input.rating
+    }
+
+    const query = { name: entry.name };
+    const update = { $set: entry };
+    const options = { upsert: true, new: true };
+
+    const result = await collection.updateOne(query, update, options);
+
+    console.log(`Creation result: ${JSON.stringify(result)}\n`)
 }
 
 
@@ -65,7 +99,7 @@ async function createEntry()
 // Retrieve all saved entities
 app.get("/profs", function (req, res) {
     // TODO: Insert mongoDb query
-    retrieveEntries();
+    res.body = retrieveEntries();
 });
 
 // Retrieve one saved entity
@@ -89,7 +123,12 @@ app.delete("/profs/:id", function (req, res) {
 // Crrate a new entity
 app.post("/profs", function (req, res) {
     // TODO: Insert mongoDb query
-    createEntry();
+
+    console.log(req.body);
+    const newEntry = req.body;
+    createEntry(newEntry);
+    const allEntries = retrieveEntries();
+    
 });
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
