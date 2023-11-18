@@ -24,13 +24,14 @@ function log(req, res, next) {
 }
 app.use(log);
 
-main();
-
 async function main() {
     await client.connect();
     console.log(`Connecting to database:\t${db.databaseName}\n`);
-    const indexResult = await collection.createIndex({ name: 1 });
+    console.log(`Connecting to collection:\t${collection.collectionName}\n`);
+    await collection.createIndex({ name: 1 });
 }
+
+main();
 
 //Endpoints
 // Retrieve all saved entities
@@ -38,7 +39,6 @@ app.get("/profs", async function (req, res) {
     // TODO: Insert mongoDb query
     const query = {}
     const result = await collection.find(query).toArray();
-    console.log(result);
     res.status(200).send(result);
 });
 
@@ -46,10 +46,8 @@ app.get("/profs", async function (req, res) {
 app.get("/profs/:id", async function (req, res) {
     // TODO: Insert mongoDb query
     const profId = req.params.id;
-
     const query = {}
     let queryResult = await collection.find(query).toArray();
-
     const entry = queryResult[profId];
     res.status(200).send(entry)
 });
@@ -57,14 +55,14 @@ app.get("/profs/:id", async function (req, res) {
 // Modify one entity
 app.put("/profs/:id", async function (req, res) {
     const profId = req.params.id;
-
     const query = {}
     let queryResult = await collection.find(query).toArray();
-
-    const toBeDeleted = queryResult[profId];
-
-    await collection.deleteOne({ id: toBeDeleted.id });
-
+    const toBeUpdated = queryResult[profId];
+    const entry = {
+        name: req.body.name,
+        rating: req.body.rating
+    }
+    await collection.updateOne({ id: toBeUpdated.id }, { $set: { rating: req.body.} })
     queryResult = await collection.find(query).toArray();
     res.status(200).send(queryResult);
 });
@@ -72,15 +70,10 @@ app.put("/profs/:id", async function (req, res) {
 // Delete one entity
 app.delete("/profs/:id", async function (req, res) {
     const profId = req.params.id;
-
     const query = {}
     let queryResult = await collection.find(query).toArray();
-
     const toBeDeleted = queryResult[profId];
-    console.log(toBeDeleted);
-
     await collection.deleteOne({ id: toBeDeleted.id });
-
     queryResult = await collection.find(query).toArray();
     res.status(200).send(queryResult);
 });
@@ -92,7 +85,6 @@ app.post("/profs", async function (req, res) {
         rating: req.body.rating
     }
     await collection.insertOne(entry);
-
     const query = {}
     const queryResult = await collection.find(query).toArray();
     res.status(200).send(queryResult);
