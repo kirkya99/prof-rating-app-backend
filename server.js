@@ -24,72 +24,13 @@ function log(req, res, next) {
 }
 app.use(log);
 
-connectToDatabase();
+main();
 
-async function connectToDatabase() {
+async function main() {
     await client.connect();
     console.log(`Connecting to database:\t${db.databaseName}\n`);
     const indexResult = await collection.createIndex({ name: 1 });
 }
-
-async function retrieveEntries() {
-    console.log('Retrieve entries');
-
-    // TODO: return all entries
-    const allProfsQuery = {
-        category: "profs"
-    }
-
-    const profs = await collection.find(allProfsQuery);
-    console.log(profs)
-    return profs;
-}
-
-async function retrieveEntry(input) {
-    console.log('Retrieve entry');
-    // TODO: return entry
-}
-
-async function modifyEntry(input) {
-    console.log('Modify entry');
-
-    // TODO: modify entry
-    const entry = {
-        category: "profs",
-        name: input.name,
-        rating: input.rating
-    }
-
-    const query = { name: entry.name };
-    const update = { $set: entry };
-    const options = { upsert: true, new: true };
-
-    const result = await collection.insertOne(entry);
-
-    console.log(`Modfication result: ${JSON.stringify(result)}\n`)
-}
-
-async function deleteEntry(input) {
-    console.log('Delete entry');
-    // TODO: delete entry
-}
-
-async function createEntry(input) {
-    console.log('Create entry');
-
-    // TODO: create entry
-
-
-    const query = { name: input.name };
-    console.log(input);
-    const update = { $set: input };
-    const options = { upsert: true, new: true };
-
-    const result = await collection.updateOne(query, update, options);
-
-    console.log(`Creation result: ${JSON.stringify(result)}\n`)
-}
-
 
 //Endpoints
 // Retrieve all saved entities
@@ -127,19 +68,19 @@ app.delete("/profs/:id", function (req, res) {
 });
 
 // Crrate a new entity
-app.post("/profs", function (req, res) {
+app.post("/profs", async function (req, res) {
 
-    // TODO: Insert mongoDb query
-    
+    // TODO: Insert mongoDb query    
     const entry = {        
         name: req.body.name,
         rating: req.body.rating
     }
-    const result = createEntry(entry);
-    // const allEntries = retrieveEntries();
-    res.status(200)
-    res.send(JSON.stringify(req.body));
+    const result = await collection.insertOne(entry);
 
+    // const allEntries = retrieveEntries();
+    res.status(200);
+    console.log(result);
+    res.send(JSON.stringify(result));
 });
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
