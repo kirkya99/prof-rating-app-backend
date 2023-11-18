@@ -45,30 +45,48 @@ app.get("/profs", async function (req, res) {
 // Retrieve one saved entity
 app.get("/profs/:id", async function (req, res) {
     // TODO: Insert mongoDb query
+    const profId = req.params.id;
 
-    res.status(200)
+    const query = {}
+    let queryResult = await collection.find(query).toArray();
+
+    const entry = queryResult[profId];
+    res.status(200).send(entry)
 });
 
 // Modify one entity
 app.put("/profs/:id", async function (req, res) {
-    // TODO: Insert mongoDb query
+    const profId = req.params.id;
 
-    res.status(200)
+    const query = {}
+    let queryResult = await collection.find(query).toArray();
 
+    const toBeDeleted = queryResult[profId];
+
+    await collection.deleteOne({ id: toBeDeleted.id });
+
+    queryResult = await collection.find(query).toArray();
+    res.status(200).send(queryResult);
 });
 
 // Delete one entity
 app.delete("/profs/:id", async function (req, res) {
-    // TODO: Insert mongoDb query
+    const profId = req.params.id;
 
-    res.status(200)
+    const query = {}
+    let queryResult = await collection.find(query).toArray();
 
+    const toBeDeleted = queryResult[profId];
+    console.log(toBeDeleted);
+
+    await collection.deleteOne({ id: toBeDeleted.id });
+
+    queryResult = await collection.find(query).toArray();
+    res.status(200).send(queryResult);
 });
 
 // Crrate a new entity
 app.post("/profs", async function (req, res) {
-
-    // TODO: Insert mongoDb query    
     const entry = {
         name: req.body.name,
         rating: req.body.rating
