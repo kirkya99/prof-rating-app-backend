@@ -10,7 +10,10 @@ const { MongoClient, ObjectId } = require('mongodb');
 const url = process.env.COSMOS_CONNECTION_STRING;
 const client = new MongoClient(url);
 
-// const string 
+// Database settings
+const db = client.db(`prof-rating-app`);
+const collection = db.collection('profs');
+
 
 //Middleware
 app.use(express.json()); //for parsing application/json
@@ -24,37 +27,69 @@ app.use(log);
 connectToDatabase();
 
 async function connectToDatabase() {
-    // Use connect method to connect to the server
     await client.connect();
-    // Database reference with creation if it does not already exist
-    const db = client.db(`prof-rating-app`);
     console.log(`New database:\t${db.databaseName}\n`);
+    const indexResult = await collection.createIndex({ name: 1 });
+
+    console.log(`indexResult: ${JSON.stringify(indexResult)}\n`);
 }
+
+async function retrieveEntries()
+{
+
+}
+
+async function retrieveEntry()
+{
+
+}
+
+async function modifyEntry()
+{
+
+}
+
+async function deleteEntry()
+{
+
+
+}
+
+async function createEntry()
+{
+
+}
+
 
 //Endpoints
 // Retrieve all saved entities
 app.get("/profs", function (req, res) {
     // TODO: Insert mongoDb query
+    retrieveEntries();
 });
 
 // Retrieve one saved entity
 app.get("/profs/:id", function (req, res) {
     // TODO: Insert mongoDb query
+    retrieveEntry();
 });
 
 // Modify one entity
 app.put("/profs/:id", function (req, res) {
     // TODO: Insert mongoDb query
+    modifyEntry();
 });
 
 // Delete one entity
 app.delete("/profs/:id", function (req, res) {
     // TODO: Insert mongoDb query
+    deleteEntry();
 });
 
 // Crrate a new entity
 app.post("/profs", function (req, res) {
     // TODO: Insert mongoDb query
+    createEntry();
 });
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
