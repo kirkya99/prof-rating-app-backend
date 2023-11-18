@@ -40,8 +40,8 @@ async function retrieveEntries() {
         category: "profs"
     }
 
-    const profs = await collection.find(allProfsQuery).toArray();
-    profs.map((prof, i) => console.log(`${++i} ${JSON.stringify(prof)}`));
+    const profs = await collection.find(allProfsQuery);
+    console.log(profs)
     return profs;
 }
 
@@ -64,7 +64,7 @@ async function modifyEntry(input) {
     const update = { $set: entry };
     const options = { upsert: true, new: true };
 
-    const result = await collection.updateOne(query, update, options);
+    const result = await collection.insertOne(entry);
 
     console.log(`Modfication result: ${JSON.stringify(result)}\n`)
 }
@@ -79,14 +79,10 @@ async function createEntry(input) {
 
     // TODO: create entry
 
-    const entry = {
-        category: "profs",
-        name: input.name,
-        rating: input.rating
-    }
 
-    const query = { name: entry.name };
-    const update = { $set: entry };
+    const query = { name: input.name };
+    console.log(input);
+    const update = { $set: input };
     const options = { upsert: true, new: true };
 
     const result = await collection.updateOne(query, update, options);
@@ -99,36 +95,51 @@ async function createEntry(input) {
 // Retrieve all saved entities
 app.get("/profs", function (req, res) {
     // TODO: Insert mongoDb query
-    res.body = retrieveEntries();
+    res.send(JSON.stringify(retrieveEntries()));
+    res.status(200)
 });
 
 // Retrieve one saved entity
 app.get("/profs/:id", function (req, res) {
     // TODO: Insert mongoDb query
     retrieveEntry();
+
+    res.status(200)
+
 });
 
 // Modify one entity
 app.put("/profs/:id", function (req, res) {
     // TODO: Insert mongoDb query
     modifyEntry();
+
+    res.status(200)
+
 });
 
 // Delete one entity
 app.delete("/profs/:id", function (req, res) {
     // TODO: Insert mongoDb query
     deleteEntry();
+
+    res.status(200)
+
 });
 
 // Crrate a new entity
 app.post("/profs", function (req, res) {
-    // TODO: Insert mongoDb query
 
-    console.log(req.body);
-    const newEntry = req.body;
-    createEntry(newEntry);
-    const allEntries = retrieveEntries();
+    // TODO: Insert mongoDb query
     
+    const entry = {        
+        name: req.body.name,
+        rating: req.body.rating
+    }
+    const result = createEntry(entry);
+    // const allEntries = retrieveEntries();
+    res.status(200)
+    res.send(JSON.stringify(req.body));
+
 });
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
